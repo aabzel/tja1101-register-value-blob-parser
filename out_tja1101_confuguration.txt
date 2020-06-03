@@ -1,0 +1,172 @@
+
+Basic control register [0h] regVal: [0x2100] [0b_0010_0001_0000_0000]
+  bit 15: RW normal operation
+  bit 14: RW normal operation
+  bit 13: RW 100 Mbit/s if SPEED_SELECT (MSB) = 0 reserved if SPEED_SELECT (MSB) = 1
+  bit 12: RW Auto negotiation not supported; always 0; a write access is ignored 
+  bit 11:RW  normal operation (clearing this bit automatically triggers a transition to Normal mode, provided control bits POWER_MODE are set to 0011 Normal mode, see Table 18) 
+  bit 10: RW normal operation 
+  bit 9:  RW Auto negotiation not supported; always 0; a write access is ignored.
+  bit 8: RW  only full duplex supported; always 1; a write access is ignored 
+  bit 7: RW  COL signal test not supported; always 0; a write access is ignored 
+  bit 6: RW 10 Mbit/s if SPEED_SELECT (LSB) = 0 100 Mbit/s if SPEED_SELECT (LSB) = 1 
+  bit 5: RW enable transmit from MII only when the PHY has determined that a valid link has been established 
+
+Basic status register [1h] regVal: [0x01e1] [0b_0000_0001_1110_0001]
+  bit 15: PHY not able to perform 100BASE-T4 
+  bit 14: PHY not able to perform 100BASE-X full-duplex
+  bit 13: PHY not able to perform 100BASE-X half-duplex 
+  bit 12: PHY not able to perform 10 Mbit/s full-duplex 
+  bit 11: PHY not able to perform 10 Mbit/s half-duplex 
+  bit 10: PHY not able to perform 100BASE-T2 full-duplex
+  bit 9: PHY not able to perform 100BASE-T2 half-duplex
+  bit 8: extended status information in register 15h
+  bit 7: PHY able to transmit from MII regardless of whether the PHY has determined that a valid link has been established
+  bit 6: PHY will accept management frames with preamble suppressed
+  bit 5: Autonegotiation process completed
+  bit 4: no remote fault condition detected
+  bit 3: PHY not able to perform Autonegotiation
+  bit 2: link is down
+  bit 1: no jabber condition detected
+  bit 0: extended register capabilities
+
+PHY identifier register 1 [2h] regVal: [0x0180] [0b_0000_0001_1000_0000]
+  bit 15..0: Organizationally Unique Identifier 0x0180
+
+PHY identifier register 2 [3h] regVal: [0xdd01] [0b_1101_1101_0000_0001]
+  bit 15..10: phyId 0x37 (19 to 24 of the OUI)
+  bit 9..4: manufacturer type number 0x10
+  bit 3..0: manufacturer  revision number 0x01
+
+Extended status register [15] regVal: [0x0080] [0b_0000_0000_1000_0000]
+  bit 15: PHY not able to perform 1000BASE-X full-duplex
+  bit 14: PHY not able to perform 1000BASE-X half-duplex 
+  bit 13: PHY not able to perform 1000BASE-T full-duplex
+  bit 12: PHY not able to perform 1000BASE-T half-duplex
+  bit 7: PHY able to 1-pair 100BASE-T1 100 Mbit/s
+  bit 6: PHY not able to support RTPGE
+
+PHY identifier register 3 [16] regVal: [0x0079] [0b_0000_0000_0111_1001]
+Lack of detalisation in datasheet
+
+Extended control register [17] regVal: [0x6000] [0b_0110_0000_0000_0000]
+  bit 15: link control disabled
+  bit 14..11: Standby mode (command)
+  bit 10: disable Slave jitter test
+  bit 9: halts the training phase
+  bit 8..6: R/W test mode selection: no test mode
+  bit 5: stops TDR-based cable test
+  bit 4..3: R/W internal loopback
+  bit 2: configuration register access disabled
+
+Configuration register 1 [18] regVal: [0x5c05] [0b_0101_1100_0000_0101]
+  bit 15: rw PHY configured as Slave
+  bit 14: rw wake-up event forwarded locally
+  bit 11: rw PHY reacts to a remote wake-up
+  bit 14: rw PHY reacts to a local wake-up
+  bit 9:8: RW MII mode enabled
+  bit 7: MII output driver standard strength
+  bit 6: no confirmation needed from another PHY before going to sleep
+  bit 5: LPS/WUR enabled
+  bit 4: sleep acknowledge timer disabled; auto-transition back from Sleep Request mode to Normal mode enabled during data transmission on MII or MDI
+  bit 2: wake-up event forwarded remotely 
+  bit 1: autonomous power-down disabled 
+  bit 0: automatic transition from Normal to Sleep Request when LPS code group received enabled 
+
+Configuration register 2 [19] regVal: [0x3245] [0b_0011_0010_0100_0101]
+  bit 15..11: r 5bit PHY address: [6]
+  bit 2: rw packets up to 16 kB supported
+
+Symbol error counter register [20] regVal: [0x0000] [0b_0000_0000_0000_0000]
+ The symbol error counter is incremented when an invalid code symbol is received (including idle symbols). The counter is incremented only once per packet, even when the received packet contains more than one symbol error. This counter increments up to 216. When the counter overflows, the value FFFFh is retained. The counter is reset when the register is read.
+ bit 15:0 R sym_err_cnt [0]
+
+Interrupt source register [21] regVal: [0x8000] [0b_1000_0000_0000_0000]
+  bit 15: R power-on detected
+  bit 14: R no local or remote wake-up detected
+  bit 13: R no dedicated wake-up request detected
+  bit 12: R no LPS code groups received
+  bit 11: R no PHY initialization error detected
+  bit 10: R link status not changed
+  bit 9: R link status not changed
+  bit 8: R no symbol error detected
+  bit 7: R no training phase failure detected
+  bit 6: R SQI value above warning limit
+  bit 5: R no SMI control error detected
+  bit 3: R no undervoltage detected
+  bit 2: R no undervoltage recovery detected
+  bit 1: R no overtemperature error detected
+  bit 0: R no transition from Sleep Request back to Normal as a result of the Sleep Request timer expiring
+
+Interrupt enable register [22] regVal: [0x8000] [0b_1000_0000_0000_0000]
+  bit 15: RW PWON interrupt enabled
+  bit 14: RW WAKEUP interrupt disabled
+  bit 13: RW WUR_RECEIVED interrupt disabled
+  bit 12: RW LPS_RECEIVED interrupt disabled
+  bit 11: RW LINK_STATUS_FAIL interrupt disabled
+  bit 10: RW LINK_STATUS_FAIL interrupt disabled
+  bit  9: RW LINK_STATUS_UP interrupt disabled
+  bit  8: RW SYM_ERR interrupt disabled
+  bit  7: RW TRAINING_FAILED interrupt disabled
+  bit  6: RW SQI_WARNING interrupt disabled
+  bit  5: RW CONTROL_ERR interrupt disabled
+  bit  3: RW UV_ERR interrupt disabled
+  bit  2: RW UV_RECOVERY interrupt disabled
+  bit  1: RW TEMP_ERR interrupt disabled
+  bit  0: RW SLEEP_ABORT interrupt disabled
+
+Communication status register [23] regVal: [0x0000] [0b_0000_0000_0000_0000]
+  bit 15: r link failure
+  bit 12: r local receiver not OK
+  bit 11: r remote receiver not OK
+  bit 10: r descrambler unlocked
+  bit 9: r no SSD error detected
+  bit 8: r no ESD error detected
+  bit 7..5: r worse than class A SQI (unstable link)
+  bit 4: r no receive error detected
+  bit 3: r no transmit error detected
+  bit 2..0: r PHY Idle
+
+General status register [24] regVal: [0x0200] [0b_0000_0010_0000_0000]
+  bit 15 R all interrupts cleared
+  bit 14 R PLL unstable and not locked
+  bit 13 R no local wake-up detected
+  bit 12 R no remote wake-up detected
+  bit 11 R no 100BASE-T1 data detected at MDI or MII in Sleep Request mode
+  bit 10 R EN HIGH
+  bit 9 R hardware reset detected since register last read
+  bit 8 R reserved
+  bit 7:3 R linkFailCnt: [0]
+  bit 2:0 R reserved
+
+External status register [25] regVal: [0x0000] [0b_0000_0000_0000_0000]
+  bit 15: R no undervoltage detected on pin VDDD(3V3)
+  bit 14: R no undervoltage detected on pin VDDA(3V3)
+  bit 13: R no undervoltage detected on pin VDDD(1V8)
+  bit 11: R no undervoltage detected on pin VDD(IO)
+  bit 10: R temperature below high level
+  bit 9: R temperature below warning level
+  bit 8: R no short circuit detected
+  bit 7: R no open circuit detected
+  bit 6: R no polarity inversion detected at MDI
+  bit 5: R interleave order of detected ternary symbols: TAn, TBn
+
+Link-fail counter register [26] regVal: [0x0000] [0b_0000_0000_0000_0000]
+  bit 15:8 R [0] The counter is incremented when local receiver is NOT_OK; when the counter overflows, the value FFh is retained. The counter is reset when the register is read.
+  bit 7:0  R [0] The counter is incremented when remote receiver is NOT_OK; when the counter overflows, the value FFh is retained. The counter is reset when the register is read.
+
+Common configuration register [27] regVal: [0x0020] [0b_0000_0000_0010_0000]
+  bit 15: R/W managed operation
+  bit 13:12 RW 25 MHz XTAL; no clock at CLK_IN_OUT
+  bit 11: R/W internal 1.8 V LDO enabled
+  bit 10:  R/W standard output driver strength at output of CLK_IN_OUT
+  bit 9: R/W XTAL and CLK_IN_OUT output switched off in Sleep mode
+  bit 8:7 RW local wake-up timer: longest (10 ms to 20 ms)
+  bit 6: R/W absolute input threshold
+  bit 5:  R/W INH switched on in Disable mode
+  bit 4:0:  R/W reserved
+
+Configuration register 3 [28] regVal: [0x0001] [0b_0000_0000_0000_0001]
+  bit 15:2: RW reserved
+  bit 1: RW forced sleep inactive
+  bit 0: RW write 1; ignore on read
