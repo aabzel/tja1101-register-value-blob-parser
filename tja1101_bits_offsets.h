@@ -1,0 +1,143 @@
+#ifndef TJA1101_BIT_OFFSETS_H
+#define TJA1101_BIT_OFFSETS_H
+
+#define RESET_BIT_15 (1<<15)
+#define LOOPBACK_14 (1<<14)
+#define SPEED_SELECT_13 (1<<13)
+#define AUTONEG_EN_12 (1<<12)
+#define POWER_DOWN_11 (1<<11)
+#define ISOLATE_10 (1<<10)
+#define RE_AUTONEG_9 (1<<9)
+#define DUPLEX_MODE_8 (1<<8)
+#define COLLISION_TEST_7 (1<<7)
+#define SPEED_SELECT_6  (1<<6)
+#define UNIDIRECT_EN_5 (1<<5)
+
+//Basic status register
+#define S100BASE_T4_15 (1<<15)
+#define S100BASE_X_FD_14  (1<<14)
+#define S100BASE_X_HD_13  (1<<13)
+#define S10Mbps_FD_12  (1<<12)
+#define S10Mbps_HD_11  (1<<11)
+#define S100BASE_T2_FD_10  (1<<10)
+#define S100BASE_T2_HD_9  (1<<9)
+#define EXTENDED_STATUS_8  (1<<8)
+#define UNIDIRECT_ABILITY_7  (1<<7)
+#define MF_PREAMBLE_SUPPRESSION_6  (1<<6)
+#define AUTONEG_COMPLETE_5  (1<<5)
+#define REMOTE_FAULT_4  (1<<4)
+#define AUTONEG_ABILITY_3  (1<<3)
+#define LINK_STATUS_2  (1<<2)
+#define JABBER_DETECT_1  (1<<1)
+#define EXTENDED_CAPABILITY_0  (1<<0)
+
+#define S1000BASE_X_FD_15  (1<<15)
+#define S1000BASE_X_HD_14  (1<<14)
+#define S1000BASE_T_FD_13  (1<<13)
+#define S1000BASE_T_HD_12  (1<<12)
+#define S100BASE_T1_7  (1<<7)
+#define S1000BASE_RTPGE_6 (1<<6)
+
+#define LINK_CONTROL_15 (1<<15) //RW
+#define SLAVE_JITTER_TEST_10 (1<<10)//RW
+#define TRAINING_RESTART_9 (1<<9) //rw
+#define CABLE_TEST_5 (1<<5) //rw
+#define CONFIG_EN_2 (1<<2) //rw
+
+#define JUMBO_ENABLE_2 (1<<2)
+
+#define LINK_UP_15 (1<<15)
+
+#define AUTO_OP_15 (1<<15)
+#define LDO_MODE_11 (1<<11)
+#define CLK_DRIVER_10 (1<<10)
+#define CLK_HOLD_9 (1<<9)
+#define CONFIG_WAKE_6 (1<<6)
+#define CONFIG_INH_5  (1<<5)
+#define FORCE_SLEEP_1 (1<<1)
+
+#define LOC_RCVR_STATUS_12  (1<<12)
+#define REM_RCVR_STATUS_11  (1<<11)
+#define SCR_LOCKED_10  (1<<10)
+#define SSD_ERR_9  (1<<9)
+#define ESD_ERR_8  (1<<8)
+#define RECEIVE_ERR_4  (1<<4)
+#define TRANSMIT_ERR_3  (1<<3)
+
+#define MASTER_SLAVE_15  (1<<15)
+#define FWDPHYLOC_14  (1<<14 )
+#define REMWUPHY_11  (1<<11 )
+#define LOCWUPHY_10  (1<<10 )
+#define MII_DRIVER_7  (1<<7 )
+#define SLEEP_CONFIRM_6  (1<<6 )
+#define LPS_WUR_DIS_5  (1<<5 )
+#define SLEEP_ACK_4  (1<<4 )
+#define FWDPHYREM_2  (1<<2 )
+#define AUTO_PWD_1  (1<<1 )
+#define LPS_ACTIVE_0  (1<<0 )
+
+/*External status register (register 25)*/
+#define UV_VDDD_3V3_15  (1<<15)
+#define UV_VDDA_3V3_14  (1<<14)
+#define UV_VDDD_1V8_13  (1<<13)
+#define UD_VDDIO_11  (1<<11)
+#define TEMP_HIGH_10  (1<<10)
+#define TEMP_WARN_9  (1<<9)
+#define SHORT_DETECT_8  (1<<8)
+#define OPEN_DETECT_7  (1<<7)
+#define POLARITY_DETECT_6  (1<<6)
+#define INTERLEAVE_DETECT_5  (1<<5)
+
+// Configuration register 3 (register 28)
+#define FORCE_SLEEP_1 (1<<1)
+
+//Common configuration register (register 27)
+#define AUTO_OP_15  (1<<15)
+#define CLK_DRIVER_10  (1<<10)
+#define CLK_HOLD_9   (1<<9)
+#define CONFIG_WAKE_6  (1<<6)
+#define CONFIG_INH_5  (1<<5)
+
+#define INT_STATUS_15  (1<<15)
+#define PLL_LOCKED_14  (1<<14)
+#define LOCAL_WU_13  (1<<13)
+#define REMOTE_WU_12  (1<<12)
+#define DATA_DET_WU_11  (1<<11)
+#define EN_STATUS_10  (1<<10)
+#define RESET_STATUS_9 (1<<9)
+
+//Interrupt status register (register 21)
+#define PWON_15  (1<<15)
+#define WAKEUP_14  (1<<14)
+#define WUR_RECEIVED_13  (1<<13)
+#define LPS_RECEIVED_12  (1<<12)
+#define PHY_INIT_FAIL_11  (1<<11)
+#define LINK_STATUS_FAIL_10  (1<<10)
+#define LINK_STATUS_UP_9  (1<<9)
+#define SYM_ERR_8  (1<<8)
+#define TRAINING_FAILED_7  (1<<7)
+#define SQI_WARNING_6  (1<<6)
+#define CONTROL_ERR_5  (1<<5)
+#define UV_ERR_3  (1<<3)
+#define UV_RECOVERY_2  (1<<2)
+#define TEMP_ERR_1  (1<<1)
+#define SLEEP_ABORT_0  (1<<0)
+
+//Interrupt enable register
+#define PWON_EN_15  (1<<15)
+#define WAKEUP_EN_14  (1<<14)
+#define WUR_RECEIVED_EN_13  (1<<13)
+#define LPS_RECEIVED_EN_12  (1<<12)
+#define PHY_INIT_FAIL_EN_11  (1<<11)
+#define LINK_STATUS_FAIL_EN_10  (1<<10)
+#define LINK_STATUS_UP_EN_9  (1<<9)
+#define SYM_ERR_EN_8  (1<<8)
+#define TRAINING_FAILED_EN_7  (1<<7)
+#define SQI_WARNING_EN_6  (1<<6)
+#define CONTROL_ERR_EN_5  (1<<5)
+#define UV_ERR_EN_3  (1<<3)
+#define UV_RECOVERY_EN_2  (1<<2)
+#define TEMP_ERR_EN_1  (1<<1)
+#define SLEEP_ABORT_EN_0  (1<<0)
+
+#endif /* TJA1101_BIT_OFFSETS_H */
