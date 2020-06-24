@@ -1,4 +1,4 @@
-#include "parse_phy_regs.h"
+#include "parse_tja1101_regs.h"
 
 #include "str_ops.h"
 #include "tja1101_bits_offsets.h"
@@ -9,7 +9,9 @@
 #include <stdint.h>
 #include <string.h>
 
-bool parse_phy_regs_file (char *inFileName, char *outFileName) {
+extern regTJA1101_t tja1101RegMap [TJA1101_REG_NUM];
+
+bool parse_tja1101_regs_file (char *inFileName, char *outFileName) {
     (void) *outFileName;
     char curFileStr [500];
     bool res = false;
@@ -20,11 +22,16 @@ bool parse_phy_regs_file (char *inFileName, char *outFileName) {
     if (inFilePrt && outFilePrt) {
         int line = 0;
         while (NULL != fgets (curFileStr, sizeof(curFileStr), inFilePrt)) {
-            unsigned int regAddr;
-            unsigned int regVal;
-            //printf ("\n>[%s]", curFileStr);
-            sscanf (curFileStr, "%x %x", (unsigned int *) &regAddr, (unsigned int *) &regVal);
-            parse_reg (regAddr, regVal, outFilePrt);
+            uint8_t regAddr;
+            uint16_t regVal;
+            printf ("%s", curFileStr);
+            res = try_canch_hex_uint8 (curFileStr, strlen (curFileStr), &regAddr);
+            if (true == res) {
+                res = try_canch_hex_uint16 (curFileStr, strlen (curFileStr), &regVal);
+                if (true == res) {
+                    parse_tja1101_reg (regAddr, regVal, outFilePrt);
+                }
+            }
             //printf ("\n[%x] [%x]", regAddr, regVal);
             line++;
         }
@@ -33,110 +40,83 @@ bool parse_phy_regs_file (char *inFileName, char *outFileName) {
         res = true;
     }
     return res;
-
 }
 
-bool parse_reg (uint8_t regAddr, uint16_t regVal, FILE *outFilePrt) {
+bool parse_tja1101_reg (uint8_t regAddr, uint16_t regVal, FILE *outFilePrt) {
     bool res = false;
-    switch (regAddr) {
-        case 0:
-            printf ("\nBasic control register \t\t [0h] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            fprintf (outFilePrt, "\nBasic control register [0h] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            res = parse_basic_control_register (regVal, outFilePrt);
-            break;
-        case 1:
-            printf ("\nBasic status register \t\t [1h] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            fprintf (outFilePrt, "\nBasic status register [1h] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            res = parse_basic_status_register (regVal, outFilePrt);
-            break;
-        case 2:
-            printf ("\nPHY identifier register 1 \t [2h] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            fprintf (outFilePrt, "\nPHY identifier register 1 [2h] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            res = parse_phy_identifier_1_register (regVal, outFilePrt);
-            break;
-        case 3:
-            printf ("\nPHY identifier register 2 \t [3h] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            fprintf (outFilePrt, "\nPHY identifier register 2 [3h] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            res = parse_phy_identifier_2_register (regVal, outFilePrt);
-            break;
-        case 15:
-            printf ("\nExtended status register \t [15] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            fprintf (outFilePrt, "\nExtended status register [15] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            res = parse_extended_status_register (regVal, outFilePrt);
-            break;
-        case 16:
-            printf ("\nPHY identifier register 3 \t [16] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            fprintf (outFilePrt, "\nPHY identifier register 3 [16] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            res = parse_phy_identifier_3_register (regVal, outFilePrt);
-            break;
-        case 17:
-            printf ("\nExtended control register \t [17] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            fprintf (outFilePrt, "\nExtended control register [17] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            res = parse_extended_control_register (regVal, outFilePrt);
-            break;
-        case 18:
-            printf ("\nConfiguration register 1 \t [18] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            fprintf (outFilePrt, "\nConfiguration register 1 [18] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            res = parse_configuration_register_1 (regVal, outFilePrt);
-            break;
+    char curRegName [100] = "";
+    strncpy (curRegName, reg_name (regAddr), sizeof(curRegName));
+    //printf ("\nReg name: %s \t\t reg addr: %u regVal: [0x%04x] or [0b_%s]", reg_name (regAddr),regAddr, regVal, utoa_bin16 (regVal));
+    if (0 != strcmp (UNDEF_REG_NAME, curRegName)) {
+        fprintf (
+            outFilePrt,
+            "\n Register name: [%30s] register addr: [%02u] register value: [0x%04x] or [0b_%s]",
+            reg_name (regAddr),
+            regAddr,
+            regVal,
+            utoa_bin16 (regVal));
+        switch (regAddr) {
+            case 0:
+                res = parse_basic_control_register (regVal, outFilePrt);
+                break;
+            case 1:
+                res = parse_basic_status_register (regVal, outFilePrt);
+                break;
+            case 2:
+                res = parse_phy_identifier_1_register (regVal, outFilePrt);
+                break;
+            case 3:
+                res = parse_phy_identifier_2_register (regVal, outFilePrt);
+                break;
+            case 15:
+                res = parse_extended_status_register (regVal, outFilePrt);
+                break;
+            case 16:
+                res = parse_phy_identifier_3_register (regVal, outFilePrt);
+                break;
+            case 17:
+                res = parse_extended_control_register (regVal, outFilePrt);
+                break;
+            case 18:
+                res = parse_configuration_register_1 (regVal, outFilePrt);
+                break;
 
-        case 19:
-            printf ("\nConfiguration register 2 \t [19] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            fprintf (outFilePrt, "\nConfiguration register 2 [19] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            res = parse_configuration_register_2 (regVal, outFilePrt);
-            break;
-        case 20:
-            printf ("\nSymbol error counter register \t [20] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            fprintf (outFilePrt, "\nSymbol error counter register [20] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            res = parse_symbol_error_counter_register (regVal, outFilePrt);
-            break;
-        case 21:
-            printf ("\nInterrupt status register \t [21] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            fprintf (outFilePrt, "\nInterrupt source register [21] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            res = parse_interrupt_status_register (regVal, outFilePrt);
-            break;
-        case 22:
-            printf ("\nInterrupt enable register \t [22] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            fprintf (outFilePrt, "\nInterrupt enable register [22] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            res = parse_interrupt_enable_register (regVal, outFilePrt);
-            break;
-        case 23:
-            printf ("\nCommunication status register \t [23] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            fprintf (outFilePrt, "\nCommunication status register [23] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            res = parse_communication_status_register (regVal, outFilePrt);
-            break;
-        case 24:
-            printf ("\nGeneral status register \t [24] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            fprintf (outFilePrt, "\nGeneral status register [24] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            res = parse_general_status_register (regVal, outFilePrt);
-            break;
-        case 25:
-            printf ("\nExternal status register \t [25] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            fprintf (outFilePrt, "\nExternal status register [25] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            res = parse_external_status_register (regVal, outFilePrt);
-            break;
-        case 26:
-            printf ("\nLink-fail counter register \t [26] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            fprintf (outFilePrt, "\nLink-fail counter register [26] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            res = parse_link_fail_counter_register (regVal, outFilePrt);
-            break;
-        case 27:
-            printf ("\nCommon configuration register \t [27] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            fprintf (outFilePrt, "\nCommon configuration register [27] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            res = parse_common_configuration_register (regVal, outFilePrt);
-            break;
-        case 28:
-            printf ("\nConfiguration register 3 \t [28] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            fprintf (outFilePrt, "\nConfiguration register 3 [28] regVal: [0x%04x] [0b_%s]", regVal, utoa_bin16 (regVal));
-            res = parse_configuration_register_3 (regVal, outFilePrt);
-            break;
-        default:
-            break;
+            case 19:
+                res = parse_configuration_register_2 (regVal, outFilePrt);
+                break;
+            case 20:
+                res = parse_symbol_error_counter_register (regVal, outFilePrt);
+                break;
+            case 21:
+                res = parse_interrupt_status_register (regVal, outFilePrt);
+                break;
+            case 22:
+                res = parse_interrupt_enable_register (regVal, outFilePrt);
+                break;
+            case 23:
+                res = parse_communication_status_register (regVal, outFilePrt);
+                break;
+            case 24:
+                res = parse_general_status_register (regVal, outFilePrt);
+                break;
+            case 25:
+                res = parse_external_status_register (regVal, outFilePrt);
+                break;
+            case 26:
+                res = parse_link_fail_counter_register (regVal, outFilePrt);
+                break;
+            case 27:
+                res = parse_common_configuration_register (regVal, outFilePrt);
+                break;
+            case 28:
+                res = parse_configuration_register_3 (regVal, outFilePrt);
+                break;
+            default:
+                break;
+        }
     }
     return res;
 }
-
-#define LOOPBACK (1<<14)
 
 bool parse_basic_control_register (uint16_t regVal, FILE *outFilePrt) {
     bool res = false;
@@ -641,8 +621,10 @@ bool parse_symbol_error_counter_register (uint16_t regVal, FILE *outFilePrt) {
     (void) regVal;
     (void) outFilePrt;
     uint16_t sym_err_cnt = regVal;
-    fprintf (outFilePrt, "\n The symbol error counter is incremented when an invalid code symbol is received (including idle symbols). The counter is incremented only once per packet, even when the received packet contains more than one symbol error. This counter increments up to 216. When the counter overflows, the value FFFFh is retained. The counter is reset when the register is read.");
-    fprintf (outFilePrt, "\n bit 15:0 R sym_err_cnt [%u]",sym_err_cnt);
+    fprintf (
+        outFilePrt,
+        "\n The symbol error counter is incremented when an invalid code symbol is received (including idle symbols). The counter is incremented only once per packet, even when the received packet contains more than one symbol error. This counter increments up to 216. When the counter overflows, the value FFFFh is retained. The counter is reset when the register is read.");
+    fprintf (outFilePrt, "\n bit 15:0 R sym_err_cnt [%u]", sym_err_cnt);
     fprintf (outFilePrt, "\n");
     return true;
 }
@@ -674,12 +656,12 @@ bool parse_interrupt_status_register (uint16_t regVal, FILE *outFilePrt) {
         fprintf (outFilePrt, "\n  bit 11: R no PHY initialization error detected");
     }
     if (regVal & LINK_STATUS_FAIL_10) {
-        fprintf (outFilePrt, "\n  bit 10: R link status bit LINK_UP changed from ‘link OK’ to ‘link fail’");
+        fprintf (outFilePrt, "\n  bit 10: R link status bit LINK_UP changed from вЂ�link OKвЂ™ to вЂ�link failвЂ™");
     } else {
         fprintf (outFilePrt, "\n  bit 10: R link status not changed");
     }
     if (regVal & LINK_STATUS_UP_9) {
-        fprintf (outFilePrt, "\n  bit 9: R link status bit LINK_UP changed from ‘link fail’ to ‘link OK’");
+        fprintf (outFilePrt, "\n  bit 9: R link status bit LINK_UP changed from вЂ�link failвЂ™ to вЂ�link OKвЂ™");
     } else {
         fprintf (outFilePrt, "\n  bit 9: R link status not changed");
     }
@@ -704,7 +686,7 @@ bool parse_interrupt_status_register (uint16_t regVal, FILE *outFilePrt) {
         fprintf (outFilePrt, "\n  bit 5: R no SMI control error detected");
     }
     if (regVal & UV_ERR_3) {
-        fprintf (outFilePrt, "\n  bit 3: R undervoltage detected on VDD(IO), VDDD(3V3), VDDD(1V8) or VDDA(3V3);" );
+        fprintf (outFilePrt, "\n  bit 3: R undervoltage detected on VDD(IO), VDDD(3V3), VDDD(1V8) or VDDA(3V3);");
     } else {
         fprintf (outFilePrt, "\n  bit 3: R no undervoltage detected");
     }
@@ -1102,3 +1084,68 @@ bool parse_loc_wu_tim (uint8_t loc_wu_tim, FILE *outFilePrt) {
     }
     return res;
 }
+
+const char *reg_name (uint8_t regAddr) {
+    const char *reg_name = UNDEF_REG_NAME;
+    switch (regAddr) {
+        case 0:
+            reg_name = "Basic control register";
+            break;
+        case 1:
+            reg_name = "Basic status register";
+            break;
+        case 2:
+            reg_name = "PHY identifier register 1";
+            break;
+        case 3:
+            reg_name = "PHY identifier register 2";
+            break;
+        case 15:
+            reg_name = "Extended status register";
+            break;
+        case 16:
+            reg_name = "PHY identifier register 3";
+            break;
+        case 17:
+            reg_name = "Extended control register";
+            break;
+        case 18:
+            reg_name = "Configuration register 1";
+            break;
+        case 19:
+            reg_name = "Configuration register 2";
+            break;
+        case 20:
+            reg_name = "Symbol error counter register";
+            break;
+        case 21:
+            reg_name = "Interrupt source register";
+            break;
+        case 22:
+            reg_name = "Interrupt enable register";
+            break;
+        case 23:
+            reg_name = "Communication status register";
+            break;
+        case 24:
+            reg_name = "General status register";
+            break;
+        case 25:
+            reg_name = "External status register";
+            break;
+        case 26:
+            reg_name = "Link-fail counter register";
+            break;
+        case 27:
+            reg_name = "Common configuration register";
+            break;
+        case 28:
+            reg_name = "Configuration register 3";
+            break;
+        default:
+            reg_name = UNDEF_REG_NAME;
+            break;
+    }
+    return reg_name;
+}
+
