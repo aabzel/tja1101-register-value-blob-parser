@@ -1,7 +1,7 @@
 # tja1101-register-value-blob-parser
 tja1101 binary register value blob parser (interpreter)
 
-That is a utility tool to interpret the raw binary TJA1101 registers values blob to human readable *.txt configuration report according the TJA1101 datasheet.
+That is a utility tool to interpret the raw binary *TJA1101* registers values blob to human readable *.txt configuration report according the TJA1101 datasheet.
 As a example there are data-in and data-out for tja1101 *.txt. 
 Users all over the world may appreciate that diagnostic tool and such support of TJA1101.
 
