@@ -14,5 +14,5 @@ Thus developers will get the entire **bird's eye view** representation of chip c
 That is a very **handy** tool for diagnostic and **bug** search.
 
 
-You must unstall cygwin1.dll in C:\cygwin64\bin\
+You must install cygwin1.dll in C:\cygwin64\bin\
 
