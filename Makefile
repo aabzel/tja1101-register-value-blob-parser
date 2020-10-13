@@ -16,11 +16,12 @@ CC = gcc
 CFLAGS  = -g -Wall
 CFLAGS  += -DHAS_PARSE_REG
 CFLAGS  += -DHAS_UTESTS
+CFLAGS  += -DHAS_TJA1101
 
 #files to link:
 LFLAGS =
   
-EXECUTABLE=reg_paraser
+EXECUTABLE=reg_parser
 # the name to use for both the target source file, and the output file:
 #TARGET = main
 
@@ -33,8 +34,9 @@ SOURCES += $(SRC_PATH)/convert.c
 SOURCES += $(SRC_PATH)/test_convert.c  
 SOURCES += $(SRC_PATH)/float_utils.c  
 SOURCES += $(SRC_PATH)/parse_regs.c
+
 SOURCES += $(SRC_PATH)/parse_tja1101_regs.c
-SOURCES += $(SRC_PATH)/parse_tic12400_regs.c
+
 SOURCES += $(SRC_PATH)/uTests.c   
 SOURCES += $(SRC_PATH)/str_ops.c
 SOURCES += $(SRC_PATH)/test_str_ops.c    
